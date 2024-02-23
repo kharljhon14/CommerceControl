@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
-import { sql } from '../db';
+import { schemaValidator } from '../utils/schemaValidator';
+import { SignUpSchema } from '../schemas/user.schema';
 
 export async function signUp(request: Request, response: Response) {
   try {
-    const userRes = await sql('select * from users');
+    const { body } = request;
 
-    console.log(userRes.rows);
+    const res = schemaValidator(SignUpSchema, body);
+
+    if (res) return response.status(400).json({ message: res.trim() });
 
     return response.json({
       message: 'Success',
