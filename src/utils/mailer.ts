@@ -12,12 +12,7 @@ function generateEmailTransporter() {
   });
 }
 
-interface Profile {
-  email: string;
-  url: string;
-}
-
-export function sendVerificationEmail({ email, url }: Profile) {
+export function sendVerificationEmail(email: string, url: string) {
   const transporter = generateEmailTransporter();
 
   transporter.sendMail({
