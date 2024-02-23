@@ -12,7 +12,7 @@ function generateEmailTransporter() {
   });
 }
 
-export function sendVerificationEmail(email: string, url: string) {
+export function sendActivationTokenEmail(email: string, url: string) {
   const transporter = generateEmailTransporter();
 
   transporter.sendMail({

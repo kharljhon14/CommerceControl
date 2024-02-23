@@ -4,11 +4,11 @@ import { SignUpSchema, SignUpSchemaType } from '../schemas/user.schema';
 
 import { sql } from '../db';
 import { hashPassword } from '../utils/helpers';
+import { createActivationToken } from '../utils/tokens';
+import { sendActivationTokenEmail } from '../utils/mailer';
 
 export async function signUp(request: Request, response: Response) {
   try {
-    const params = request.url;
-
     const signUpBody: SignUpSchemaType = request.body;
 
     const res = schemaValidator(SignUpSchema, signUpBody);
@@ -17,8 +17,22 @@ export async function signUp(request: Request, response: Response) {
 
     const userRes = await sql('select email from users where email = $1', [signUpBody.email]);
 
-    if (userRes.rowCount !== 0)
+    if (userRes.rowCount !== 0) {
+      const user = userRes.rows[0];
+
+      if (!user.activated) {
+        const token = createActivationToken({ id: user.id });
+
+        const url = `http://localhost:8000/${token}`;
+
+        sendActivationTokenEmail(user.email, url);
+        return response
+          .status(409)
+          .json({ message: 'Email already exists, please check you email to activate' });
+      }
+
       return response.status(409).json({ message: 'Email already exists' });
+    }
 
     const hashedPassword = await hashPassword(signUpBody.password);
 
@@ -30,6 +44,24 @@ export async function signUp(request: Request, response: Response) {
     return response.json({
       data: newUserRes.rows[0],
     });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
+export async function sendActivationEmail(request: Request, response: Response) {
+  try {
+    const userRes = await sql('select id, email from users where id = $1', [request.body.id]);
+
+    if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
+
+    const { id, email } = userRes.rows[0];
+
+    const token = createActivationToken({ id });
+
+    const url = `http://localhost:8000/${token}`;
+
+    sendActivationTokenEmail(email, url);
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
