@@ -1,7 +1,7 @@
 import { Client, QueryResult, QueryResultRow } from 'pg';
 import { PG_URL } from '../utils/variables';
 
-function getClient() {
+export function getClient() {
   const client = new Client({
     connectionString: PG_URL,
   });
@@ -17,7 +17,7 @@ export async function sql<T extends QueryResultRow>(
 
   await client.connect();
 
-  const res = client.query(sql, values);
+  const res = await client.query(sql, values);
 
   await client.end();
 
