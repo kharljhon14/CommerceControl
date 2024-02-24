@@ -56,20 +56,8 @@ export async function signUp(request: Request, response: Response) {
 
     const userRes = await sql<User>('select email from users where email = $1', [signUpBody.email]);
 
-    if (userRes.rowCount !== 0) {
-      const user = userRes.rows[0];
-
-      if (!user.activated) {
-        const url = `http://localhost:8000/${user.id}`;
-
-        sendActivationTokenEmail(user.email, url);
-        return response
-          .status(409)
-          .json({ message: 'Email already exists, please check you email to activate' });
-      }
-
+    if (userRes.rowCount !== 0)
       return response.status(409).json({ message: 'Email already exists' });
-    }
 
     const hashedPassword = await hashPassword(signUpBody.password);
 
