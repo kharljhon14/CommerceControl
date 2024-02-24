@@ -76,7 +76,18 @@ export async function signUp(request: Request, response: Response) {
 }
 
 export async function getUser(request: Request, response: Response) {
-  return response.json({ messag: 'Success' });
+  try {
+    const { userId } = request;
+
+    const userRes = await sql<User>('select id, email, name from users where id = $1', [userId]);
+
+    return response.json({
+      message: 'Success',
+      data: userRes.rows[0],
+    });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
 }
 
 export async function sendActivationEmail(request: Request, response: Response) {
