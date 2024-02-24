@@ -4,8 +4,8 @@ import { SignUpSchema, SignUpSchemaType } from '../schemas/user.schema';
 
 import { sql } from '../db';
 import { hashPassword } from '../utils/helpers';
-import { createActivationToken } from '../utils/tokens';
 import { sendActivationTokenEmail } from '../utils/mailer';
+import { User } from '../types/user';
 
 export async function signUp(request: Request, response: Response) {
   try {
@@ -15,7 +15,7 @@ export async function signUp(request: Request, response: Response) {
 
     if (res) return response.status(400).json({ message: res.trim() });
 
-    const userRes = await sql('select email from users where email = $1', [signUpBody.email]);
+    const userRes = await sql<User>('select email from users where email = $1', [signUpBody.email]);
 
     if (userRes.rowCount !== 0) {
       const user = userRes.rows[0];
@@ -40,6 +40,7 @@ export async function signUp(request: Request, response: Response) {
     );
 
     return response.json({
+      message: 'Success',
       data: newUserRes.rows[0],
     });
   } catch (err) {
@@ -49,7 +50,7 @@ export async function signUp(request: Request, response: Response) {
 
 export async function sendActivationEmail(request: Request, response: Response) {
   try {
-    const userRes = await sql('select id, email from users where id = $1', [request.body.id]);
+    const userRes = await sql<User>('select id, email from users where id = $1', [request.body.id]);
 
     if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
 
@@ -72,7 +73,7 @@ export async function activateAccount(request: Request, response: Response) {
   try {
     const { id } = request.params;
 
-    const userRes = await sql('select * from users where id = $1', [id]);
+    const userRes = await sql<User>('select * from users where id = $1', [id]);
 
     if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
 
