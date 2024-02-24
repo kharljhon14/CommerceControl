@@ -55,11 +55,14 @@ export async function sendActivationEmail(request: Request, response: Response) 
 
     const { id, email } = userRes.rows[0];
 
-    const token = createActivationToken({ id });
-
-    const url = `http://localhost:8000/${token}`;
-
-    sendActivationTokenEmail(email, url);
+    sendActivationTokenEmail(email, request.body.callback_url);
+    return response.json({
+      message: 'Success',
+      data: {
+        user_id: id,
+        callback_url: request.body.callback_url,
+      },
+    });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
