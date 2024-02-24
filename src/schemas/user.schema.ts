@@ -35,3 +35,12 @@ export const SignUpSchema = z
   });
 
 export type SignUpSchemaType = z.infer<typeof SignUpSchema>;
+
+export const SendActivationEmailSchema = z.object({
+  id: z.string({ required_error: 'id is required' }).uuid({ message: 'Invalid id' }),
+  callback_url: z
+    .string({ required_error: 'callback_url is required' })
+    .url({ message: 'Invalid URL' }),
+});
+
+export type SendActivationEmailSchemaType = z.infer<typeof SendActivationEmailSchema>;

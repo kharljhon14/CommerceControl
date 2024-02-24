@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { schemaValidator } from '../utils/schemaValidator';
-import { SignUpSchema, SignUpSchemaType } from '../schemas/user.schema';
+import { SendActivationEmailSchema, SignUpSchema, SignUpSchemaType } from '../schemas/user.schema';
 
 import { sql } from '../db';
 import { hashPassword } from '../utils/helpers';
@@ -50,6 +50,10 @@ export async function signUp(request: Request, response: Response) {
 
 export async function sendActivationEmail(request: Request, response: Response) {
   try {
+    const error = schemaValidator(SendActivationEmailSchema, request.body);
+
+    if (error) return response.status(400).json({ message: error.trim() });
+
     const userRes = await sql<User>('select id, email from users where id = $1', [request.body.id]);
 
     if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
