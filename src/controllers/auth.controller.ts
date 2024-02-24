@@ -79,7 +79,9 @@ export async function getUser(request: Request, response: Response) {
   try {
     const { userId } = request;
 
-    const userRes = await sql<User>('select id, email, name from users where id = $1', [userId]);
+    const userRes = await sql<User>('select id, email, name, activated from users where id = $1', [
+      userId,
+    ]);
 
     return response.json({
       message: 'Success',

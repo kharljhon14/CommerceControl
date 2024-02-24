@@ -12,7 +12,7 @@ const router = Router();
 
 router.post('/sign-in', signIn);
 router.post('/sign-up', signUp);
-router.get('/user', isAuthenticated, isActivated, getUser);
+router.get('/user', isAuthenticated, getUser);
 router.post('/send-activation/', sendActivationEmail);
 router.post('/activate/:id', activateAccount);
 
