@@ -12,3 +12,7 @@ export function createActivationToken(payload: Payload) {
 export function createAuthToken(payload: Payload) {
   return jwt.sign(payload, SIGN_IN_SECRET, { expiresIn: '1w' });
 }
+
+export function verifyAuthToken(token: string) {
+  return jwt.verify(token, SIGN_IN_SECRET);
+}

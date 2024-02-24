@@ -75,6 +75,10 @@ export async function signUp(request: Request, response: Response) {
   }
 }
 
+export async function getUser(request: Request, response: Response) {
+  return response.json({ messag: 'Success' });
+}
+
 export async function sendActivationEmail(request: Request, response: Response) {
   try {
     const error = schemaValidator(SendActivationEmailSchema, request.body);
