@@ -21,9 +21,7 @@ export async function signUp(request: Request, response: Response) {
       const user = userRes.rows[0];
 
       if (!user.activated) {
-        const token = createActivationToken({ id: user.id });
-
-        const url = `http://localhost:8000/${token}`;
+        const url = `http://localhost:8000/${user.id}`;
 
         sendActivationTokenEmail(user.email, url);
         return response
@@ -62,6 +60,24 @@ export async function sendActivationEmail(request: Request, response: Response) 
     const url = `http://localhost:8000/${token}`;
 
     sendActivationTokenEmail(email, url);
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
+export async function activateAccount(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    const userRes = await sql('select * from users where id = $1', [id]);
+
+    if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
+
+    const user = userRes.rows[0];
+    if (user.activated) return response.status(409).json({ message: 'User already activated' });
+
+    await sql('update users set activated = $1 where id = $2', [true, id]);
+    return response.json({ message: 'Success' });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
