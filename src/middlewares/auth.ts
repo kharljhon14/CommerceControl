@@ -37,3 +37,18 @@ export async function isAuthenticated(request: Request, response: Response, next
     return response.status(500).json({ message: 'Something went wrong' });
   }
 }
+
+// isActivated must always come after isAuthenticated middleware
+export async function isActivated(request: Request, response: Response, next: NextFunction) {
+  try {
+    const userRes = await sql<User>('select activated from users where id = $1', [request.userId]);
+
+    const user = userRes.rows[0];
+
+    if (!user.activated) return response.status(401).json({ message: 'Unauthorized' });
+
+    next();
+  } catch (err) {
+    return response.status(500).json({ message: 'Something went wrong' });
+  }
+}
