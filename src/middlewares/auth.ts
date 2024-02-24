@@ -12,6 +12,9 @@ declare global {
   }
 }
 
+/**
+ * Middleware to ensure that the user is authenticated.
+ */
 export async function isAuthenticated(request: Request, response: Response, next: NextFunction) {
   try {
     const cookies = request.headers.cookie;
@@ -38,7 +41,10 @@ export async function isAuthenticated(request: Request, response: Response, next
   }
 }
 
-// isActivated must always come after isAuthenticated middleware
+/**
+ * Middleware to ensure that the user is activated.
+ * * This middleware must always be invoked after `isAuthenticated`
+ */
 export async function isActivated(request: Request, response: Response, next: NextFunction) {
   try {
     const userRes = await sql<User>('select activated from users where id = $1', [request.userId]);
