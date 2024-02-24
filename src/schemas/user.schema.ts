@@ -1,5 +1,19 @@
 import { z } from 'zod';
 
+export const SignInSchema = z.object({
+  email: z
+    .string({ required_error: 'email is required' })
+    .min(1, 'email is required')
+    .max(64, 'email must not exceed 64 characters')
+    .email(),
+  password: z
+    .string({ required_error: 'Password is required' })
+    .min(8, 'password must be at least 8 characters long')
+    .max(64, 'password must not exceed 64 character'),
+});
+
+export type SignInSchemaType = z.infer<typeof SignInSchema>;
+
 export const SignUpSchema = z
   .object({
     email: z

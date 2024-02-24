@@ -1,11 +1,50 @@
 import { Request, Response } from 'express';
 import { schemaValidator } from '../utils/schemaValidator';
-import { SendActivationEmailSchema, SignUpSchema, SignUpSchemaType } from '../schemas/user.schema';
+import {
+  SendActivationEmailSchema,
+  SignInSchema,
+  SignInSchemaType,
+  SignUpSchema,
+  SignUpSchemaType,
+} from '../schemas/user.schema';
 
 import { sql } from '../db';
-import { hashPassword } from '../utils/helpers';
+import { comparePassword, hashPassword } from '../utils/helpers';
 import { sendActivationTokenEmail } from '../utils/mailer';
 import { User } from '../types/user';
+import { createAuthToken } from '../utils/tokens';
+
+export async function signIn(request: Request, response: Response) {
+  try {
+    const error = schemaValidator(SignInSchema, request.body);
+
+    if (error) return response.status(400).json({ message: error.trim() });
+
+    const body: SignInSchemaType = request.body;
+
+    const userRes = await sql<User>('select id, password from users where email = $1', [
+      body.email,
+    ]);
+
+    if (userRes.rowCount === 0)
+      return response.status(404).json({ message: 'Invalid credentials' });
+
+    const user = userRes.rows[0];
+
+    const match = await comparePassword(body.password, user.password);
+
+    if (!match) return response.status(401).json({ message: 'Invalid credentials' });
+
+    const token = createAuthToken({ id: user.id });
+    const oneWeekMilliseconds = 7 * 24 * 60 * 60 * 1000;
+
+    response.cookie('jwt', token, { secure: true, httpOnly: true, maxAge: oneWeekMilliseconds });
+
+    return response.json({ message: 'Success' });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
 
 export async function signUp(request: Request, response: Response) {
   try {
