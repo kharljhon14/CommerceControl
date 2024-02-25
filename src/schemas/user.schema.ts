@@ -65,6 +65,9 @@ export const SendForgotPasswordSchema = z.object({
     .min(1, 'email is required')
     .max(64, 'email must not exceed 64 characters')
     .email(),
+  callback_url: z
+    .string({ required_error: 'callback_url is required' })
+    .url({ message: 'Invalid URL' }),
 });
 
 export type SendForgotPasswordSchemaType = z.infer<typeof SendForgotPasswordSchema>;

@@ -24,3 +24,16 @@ export function sendActivationTokenEmail(email: string, url: string) {
     `,
   });
 }
+
+export function sendForgotPasswordRequestEmail(email: string, url: string) {
+  const transporter = generateEmailTransporter();
+
+  transporter.sendMail({
+    from: 'test@mail.com',
+    to: email,
+    subject: 'Reset Password',
+    html: `
+    <a href='${url}'>Reset Password</a>
+    `,
+  });
+}

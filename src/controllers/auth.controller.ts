@@ -11,7 +11,7 @@ import {
 
 import { sql } from '../db';
 import { comparePassword, hashPassword } from '../utils/helpers';
-import { sendActivationTokenEmail } from '../utils/mailer';
+import { sendActivationTokenEmail, sendForgotPasswordRequestEmail } from '../utils/mailer';
 import { User } from '../types/user';
 import { createAuthToken } from '../utils/tokens';
 
@@ -93,7 +93,10 @@ export async function sendActivationEmail(request: Request, response: Response) 
 
     const { id, email } = userRes.rows[0];
 
+    // Todo make callback url for account activation
+
     sendActivationTokenEmail(email, request.body.callback_url);
+
     return response.json({
       message: 'Success',
       data: {
@@ -126,4 +129,16 @@ export async function activateAccount(request: Request, response: Response) {
 
 export async function sendForgotPasswordEmail(request: Request, response: Response) {
   const body: SendForgotPasswordSchemaType = request.body;
+
+  const userRes = await sql<User>('select email, id from users where email = $1', [body.email]);
+
+  if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
+
+  const user = userRes.rows[0];
+
+  // Todo make callback url for forgot password
+
+  sendForgotPasswordRequestEmail(user.email, body.callback_url);
+
+  return response.json({ message: 'Success' });
 }
