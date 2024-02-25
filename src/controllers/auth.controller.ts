@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { schemaValidator } from '../utils/schemaValidator';
 import {
   SendActivationEmailSchema,
+  SendForgotPasswordSchemaType,
   SignInSchema,
   SignInSchemaType,
   SignUpSchema,
@@ -16,10 +17,6 @@ import { createAuthToken } from '../utils/tokens';
 
 export async function signIn(request: Request, response: Response) {
   try {
-    const error = schemaValidator(SignInSchema, request.body);
-
-    if (error) return response.status(400).json({ message: error.trim() });
-
     const body: SignInSchemaType = request.body;
 
     const userRes = await sql<User>('select id, password from users where email = $1', [
@@ -49,10 +46,6 @@ export async function signIn(request: Request, response: Response) {
 export async function signUp(request: Request, response: Response) {
   try {
     const signUpBody: SignUpSchemaType = request.body;
-
-    const res = schemaValidator(SignUpSchema, signUpBody);
-
-    if (res) return response.status(400).json({ message: res.trim() });
 
     const userRes = await sql<User>('select email from users where email = $1', [signUpBody.email]);
 
@@ -94,10 +87,6 @@ export async function getUser(request: Request, response: Response) {
 
 export async function sendActivationEmail(request: Request, response: Response) {
   try {
-    const error = schemaValidator(SendActivationEmailSchema, request.body);
-
-    if (error) return response.status(400).json({ message: error.trim() });
-
     const userRes = await sql<User>('select id, email from users where id = $1', [request.body.id]);
 
     if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
@@ -133,4 +122,8 @@ export async function activateAccount(request: Request, response: Response) {
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
+}
+
+export async function sendForgotPasswordEmail(request: Request, response: Response) {
+  const body: SendForgotPasswordSchemaType = request.body;
 }

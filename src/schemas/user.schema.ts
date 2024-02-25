@@ -58,3 +58,13 @@ export const SendActivationEmailSchema = z.object({
 });
 
 export type SendActivationEmailSchemaType = z.infer<typeof SendActivationEmailSchema>;
+
+export const SendForgotPasswordSchema = z.object({
+  email: z
+    .string({ required_error: 'email is required' })
+    .min(1, 'email is required')
+    .max(64, 'email must not exceed 64 characters')
+    .email(),
+});
+
+export type SendForgotPasswordSchemaType = z.infer<typeof SendForgotPasswordSchema>;
