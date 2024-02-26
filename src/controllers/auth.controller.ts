@@ -1,13 +1,10 @@
 import { Request, Response } from 'express';
-import { schemaValidator } from '../utils/schemaValidator';
+
 import {
   ActivateAccountSchemaType,
   ResetPasswordSchemaType,
-  SendActivationEmailSchema,
   SendForgotPasswordSchemaType,
-  SignInSchema,
   SignInSchemaType,
-  SignUpSchema,
   SignUpSchemaType,
 } from '../schemas/user.schema';
 
