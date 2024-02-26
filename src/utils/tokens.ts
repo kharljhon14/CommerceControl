@@ -9,6 +9,10 @@ export function createActivationToken(payload: Payload) {
   return jwt.sign(payload, SIGN_UP_ACTIVATION_SECRET, { expiresIn: '5m' });
 }
 
+export function verifyActivationToken(token: string) {
+  return jwt.verify(token, SIGN_UP_ACTIVATION_SECRET);
+}
+
 export function createForgotPasswordToken(payload: Payload) {
   return jwt.sign(payload, FORGOT_PASSWORD_SECRET, { expiresIn: '5m' });
 }

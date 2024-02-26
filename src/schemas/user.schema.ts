@@ -59,6 +59,12 @@ export const SendActivationEmailSchema = z.object({
 
 export type SendActivationEmailSchemaType = z.infer<typeof SendActivationEmailSchema>;
 
+export const ActivateAccountSchema = z.object({
+  token: z.string({ required_error: 'token is required' }).min(1, 'token is required'),
+});
+
+export type ActivateAccountSchemaType = z.infer<typeof ActivateAccountSchema>;
+
 export const SendForgotPasswordSchema = z.object({
   email: z
     .string({ required_error: 'email is required' })

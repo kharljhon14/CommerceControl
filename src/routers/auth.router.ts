@@ -11,6 +11,7 @@ import {
 import { isAuthenticated } from '../middlewares/auth';
 import { validateSchemaBody } from '../middlewares/schema';
 import {
+  ActivateAccountSchema,
   ResetPasswordSchema,
   SendActivationEmailSchema,
   SendForgotPasswordSchema,
@@ -28,7 +29,7 @@ router.post(
   validateSchemaBody(SendActivationEmailSchema),
   sendActivationEmail
 );
-router.post('/activate/:id', activateAccount);
+router.post('/activate/', validateSchemaBody(ActivateAccountSchema), activateAccount);
 
 router.post(
   '/forgot-password',

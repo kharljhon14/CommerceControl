@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { schemaValidator } from '../utils/schemaValidator';
 import {
+  ActivateAccountSchemaType,
   ResetPasswordSchemaType,
   SendActivationEmailSchema,
   SendForgotPasswordSchemaType,
@@ -18,10 +19,10 @@ import {
   createActivationToken,
   createAuthToken,
   createForgotPasswordToken,
+  verifyActivationToken,
   verifyForgotPasswordToken,
 } from '../utils/tokens';
 import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
-import { error } from 'console';
 
 export async function signIn(request: Request, response: Response) {
   try {
@@ -120,19 +121,27 @@ export async function sendActivationEmail(request: Request, response: Response) 
 
 export async function activateAccount(request: Request, response: Response) {
   try {
-    const { id } = request.params;
+    const body: ActivateAccountSchemaType = request.body;
+    const payload = verifyActivationToken(body.token) as JwtPayload;
 
-    const userRes = await sql<User>('select * from users where id = $1', [id]);
+    const userRes = await sql<User>('select * from users where id = $1', [payload.id]);
 
     if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
 
     const user = userRes.rows[0];
     if (user.activated) return response.status(409).json({ message: 'User already activated' });
 
-    await sql('update users set activated = $1 where id = $2', [true, id]);
+    await sql('update users set activated = $1 where id = $2', [true, payload.id]);
     return response.json({ message: 'Success' });
   } catch (err) {
-    if (err instanceof Error) return response.status(500).json({ message: err.message });
+    if (err instanceof JsonWebTokenError)
+      return response.status(422).json({
+        message: 'Activation request expired',
+      });
+
+    return response.status(500).json({
+      message: 'Something went wrong',
+    });
   }
 }
 
