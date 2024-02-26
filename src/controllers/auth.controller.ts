@@ -13,7 +13,7 @@ import { sql } from '../db';
 import { comparePassword, hashPassword } from '../utils/helpers';
 import { sendActivationTokenEmail, sendForgotPasswordRequestEmail } from '../utils/mailer';
 import { User } from '../types/user';
-import { createAuthToken } from '../utils/tokens';
+import { createAuthToken, createForgotPasswordToken } from '../utils/tokens';
 
 export async function signIn(request: Request, response: Response) {
   try {
@@ -137,6 +137,7 @@ export async function sendForgotPasswordEmail(request: Request, response: Respon
   const user = userRes.rows[0];
 
   // Todo make callback url for forgot password
+  const token = createForgotPasswordToken({ id: user.id });
 
   sendForgotPasswordRequestEmail(user.email, body.callback_url);
 
