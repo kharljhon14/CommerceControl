@@ -36,6 +36,6 @@ router.post(
   sendForgotPasswordEmail
 );
 
-router.post('/reset-password', validateSchemaBody(ResetPasswordSchema), resetPassword);
+router.patch('/reset-password', validateSchemaBody(ResetPasswordSchema), resetPassword);
 
 export default router;

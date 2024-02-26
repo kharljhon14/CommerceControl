@@ -15,6 +15,7 @@ import { comparePassword, hashPassword } from '../utils/helpers';
 import { sendActivationTokenEmail, sendForgotPasswordRequestEmail } from '../utils/mailer';
 import { User } from '../types/user';
 import {
+  createActivationToken,
   createAuthToken,
   createForgotPasswordToken,
   verifyForgotPasswordToken,
@@ -102,13 +103,14 @@ export async function sendActivationEmail(request: Request, response: Response) 
 
     // Todo make callback url for account activation
 
+    const token = createActivationToken({ id });
+
     sendActivationTokenEmail(email, request.body.callback_url);
 
     return response.json({
       message: 'Success',
       data: {
-        user_id: id,
-        callback_url: request.body.callback_url,
+        token,
       },
     });
   } catch (err) {
@@ -145,7 +147,7 @@ export async function sendForgotPasswordEmail(request: Request, response: Respon
 
   const token = createForgotPasswordToken({ id: user.id });
 
-  // sendForgotPasswordRequestEmail(user.email, body.callback_url);
+  sendForgotPasswordRequestEmail(user.email, body.callback_url);
 
   return response.json({
     message: 'Success',
