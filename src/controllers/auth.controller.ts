@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { schemaValidator } from '../utils/schemaValidator';
 import {
+  ResetPasswordSchemaType,
   SendActivationEmailSchema,
   SendForgotPasswordSchemaType,
   SignInSchema,
@@ -13,7 +14,13 @@ import { sql } from '../db';
 import { comparePassword, hashPassword } from '../utils/helpers';
 import { sendActivationTokenEmail, sendForgotPasswordRequestEmail } from '../utils/mailer';
 import { User } from '../types/user';
-import { createAuthToken, createForgotPasswordToken } from '../utils/tokens';
+import {
+  createAuthToken,
+  createForgotPasswordToken,
+  verifyForgotPasswordToken,
+} from '../utils/tokens';
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
+import { error } from 'console';
 
 export async function signIn(request: Request, response: Response) {
   try {
@@ -136,10 +143,45 @@ export async function sendForgotPasswordEmail(request: Request, response: Respon
 
   const user = userRes.rows[0];
 
-  // Todo make callback url for forgot password
   const token = createForgotPasswordToken({ id: user.id });
 
-  sendForgotPasswordRequestEmail(user.email, body.callback_url);
+  // sendForgotPasswordRequestEmail(user.email, body.callback_url);
 
-  return response.json({ message: 'Success' });
+  return response.json({
+    message: 'Success',
+    data: {
+      token,
+    },
+  });
+}
+
+export async function resetPassword(request: Request, response: Response) {
+  try {
+    const body: ResetPasswordSchemaType = request.body;
+
+    const payload = verifyForgotPasswordToken(body.token) as JwtPayload;
+
+    const userRes = await sql<User>('select password from users where id = $1', [payload.id]);
+
+    if (userRes.rowCount === 0) return response.status(404).json({ message: 'User not found' });
+
+    const match = await comparePassword(body.password, userRes.rows[0].password);
+
+    if (match) return response.status(403).json({ message: 'Password must not be old password' });
+
+    const hashedPassword = await hashPassword(body.password);
+
+    await sql('update users set password = $1 where id = $2', [hashedPassword, payload.id]);
+
+    return response.json({ message: 'Success' });
+  } catch (err) {
+    if (err instanceof JsonWebTokenError)
+      return response.status(422).json({
+        message: 'Password reset request expired',
+      });
+
+    return response.status(500).json({
+      message: 'Something went wrong',
+    });
+  }
 }

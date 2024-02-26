@@ -71,3 +71,31 @@ export const SendForgotPasswordSchema = z.object({
 });
 
 export type SendForgotPasswordSchemaType = z.infer<typeof SendForgotPasswordSchema>;
+
+export const ResetPasswordSchema = z
+  .object({
+    token: z.string({ required_error: 'token is required' }).min(1, 'token is required'),
+    password: z
+      .string({ required_error: 'Password is required' })
+      .min(8, 'password must be at least 8 characters long')
+      .max(64, 'password must not exceed 64 character')
+      .regex(/^(?=.*[A-Z])/, 'password must contain at least one uppercase letter')
+      .regex(/^(?=.*\d)/, 'password must contain at least one numeric digit')
+      .regex(/^(?=.*[!@#$%^&*()_+])/, 'password must contain at least one special character'),
+    confirm_password: z
+      .string({ required_error: 'confirm_password is required' })
+      .min(8, 'confirm password must be at least 8 characters long')
+      .max(64, 'confirm password must not exceed 64 character')
+      .regex(/^(?=.*[A-Z])/, 'confirm password must contain at least one uppercase letter')
+      .regex(/^(?=.*\d)/, 'confirm password must contain at least one numeric digit')
+      .regex(
+        /^(?=.*[!@#$%^&*()_+])/,
+        'confirm password must contain at least one special character'
+      ),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "passwords doesn't match",
+    path: ['confirm_password'],
+  });
+
+export type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;

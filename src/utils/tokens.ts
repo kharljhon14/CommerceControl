@@ -13,6 +13,10 @@ export function createForgotPasswordToken(payload: Payload) {
   return jwt.sign(payload, FORGOT_PASSWORD_SECRET, { expiresIn: '5m' });
 }
 
+export function verifyForgotPasswordToken(token: string) {
+  return jwt.verify(token, FORGOT_PASSWORD_SECRET);
+}
+
 export function createAuthToken(payload: Payload) {
   return jwt.sign(payload, SIGN_IN_SECRET, { expiresIn: '1w' });
 }

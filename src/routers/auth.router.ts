@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   activateAccount,
   getUser,
+  resetPassword,
   sendActivationEmail,
   sendForgotPasswordEmail,
   signIn,
@@ -10,6 +11,7 @@ import {
 import { isAuthenticated } from '../middlewares/auth';
 import { validateSchemaBody } from '../middlewares/schema';
 import {
+  ResetPasswordSchema,
   SendActivationEmailSchema,
   SendForgotPasswordSchema,
   SignInSchema,
@@ -33,5 +35,7 @@ router.post(
   validateSchemaBody(SendForgotPasswordSchema),
   sendForgotPasswordEmail
 );
+
+router.post('/reset-password', validateSchemaBody(ResetPasswordSchema), resetPassword);
 
 export default router;
