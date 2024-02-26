@@ -102,8 +102,6 @@ export async function sendActivationEmail(request: Request, response: Response) 
 
     const { id, email } = userRes.rows[0];
 
-    // Todo make callback url for account activation
-
     const token = createActivationToken({ id });
 
     sendActivationTokenEmail(email, request.body.callback_url);
