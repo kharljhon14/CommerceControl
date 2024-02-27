@@ -7,10 +7,7 @@ export async function getAllProducts(request: Request, response: Response) {
 
     const pageNumber = page as string | undefined;
 
-    const parsedNumber =
-      parseInt(pageNumber ?? '0', 10) > 0
-        ? parseInt(pageNumber ?? '0', 10) - 1
-        : parseInt(pageNumber ?? '0', 10);
+    const parsedNumber = Math.max(parseInt(pageNumber ?? '0', 10) - 1, 0);
 
     const limit = 10;
     const offset = parsedNumber * limit;
