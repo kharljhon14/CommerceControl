@@ -1,10 +1,27 @@
 import { Response, Request } from 'express';
 import { sql } from '../db';
+import { Product } from '../types/product';
 export async function getAllProducts(request: Request, response: Response) {
-  // Todo get page from request query
-  const page = 0;
-  const limit = 10;
-  const offset = page * limit;
+  try {
+    const { page } = request.query;
 
-  return response.json({ message: 'Success' });
+    const pageNumber = page as string | undefined;
+
+    const parsedNumber =
+      parseInt(pageNumber ?? '0', 10) > 0
+        ? parseInt(pageNumber ?? '0', 10) - 1
+        : parseInt(pageNumber ?? '0', 10);
+
+    const limit = 10;
+    const offset = parsedNumber * limit;
+
+    const productRes = await sql<Product>('select * from products limit $1 offset $2', [
+      limit,
+      offset,
+    ]);
+
+    return response.json({ message: 'Success', data: productRes.rows });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
 }
