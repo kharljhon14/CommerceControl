@@ -2,7 +2,7 @@ import { Response, Request } from 'express';
 import { sql } from '../db';
 import { Product } from '../types/product';
 import { QueryResult } from 'pg';
-import { User } from '../types/user';
+
 export async function getAllProducts(request: Request, response: Response) {
   try {
     const { page, q } = request.query;
@@ -27,6 +27,14 @@ export async function getAllProducts(request: Request, response: Response) {
     }
 
     return response.json({ message: 'Success', data: productRes.rows });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
+export async function addProduct(request: Request, response: Response) {
+  try {
+    return response.json({ message: 'Success' });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
