@@ -1,9 +1,11 @@
 import { Response, Request } from 'express';
 import { sql } from '../db';
 import { Product } from '../types/product';
+import { QueryResult } from 'pg';
+import { User } from '../types/user';
 export async function getAllProducts(request: Request, response: Response) {
   try {
-    const { page } = request.query;
+    const { page, q } = request.query;
 
     const pageNumber = page as string | undefined;
 
@@ -12,10 +14,17 @@ export async function getAllProducts(request: Request, response: Response) {
     const limit = 10;
     const offset = parsedNumber * limit;
 
-    const productRes = await sql<Product>('select * from products limit $1 offset $2', [
-      limit,
-      offset,
-    ]);
+    let productRes: QueryResult<Product>;
+
+    if (q) {
+      productRes = await sql<Product>('select * from products where ilike $1 limit $2 offset $3', [
+        `%${q}%`,
+        limit,
+        offset,
+      ]);
+    } else {
+      productRes = await sql<Product>('select * from products limit $1 offset $2', [limit, offset]);
+    }
 
     return response.json({ message: 'Success', data: productRes.rows });
   } catch (err) {
