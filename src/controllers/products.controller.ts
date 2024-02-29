@@ -39,7 +39,7 @@ export async function addProduct(request: Request, response: Response) {
       request.body;
 
     await sql(
-      'insert into products (name, image, description, brand, price, category) values ($1, $2, $3, $4, $5, $6)',
+      'insert into products (name, image, description, brand, price, category_id) values ($1, $2, $3, $4, $5, $6)',
       [name, image, description, brand, price, category]
     );
     return response.json({ message: 'Success' });
