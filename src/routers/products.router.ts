@@ -6,7 +6,7 @@ import { AddNewProductSchema } from '../schemas/product.schema';
 
 const router = Router();
 
-router.get('/', getAllProducts);
+router.get('/', isAuthenticated, isActivated, getAllProducts);
 router.post('/', isAuthenticated, isActivated, validateSchemaBody(AddNewProductSchema), addProduct);
 
 export default router;
