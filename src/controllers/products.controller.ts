@@ -18,11 +18,10 @@ export async function getAllProducts(request: Request, response: Response) {
     let productRes: QueryResult<Product>;
 
     if (q) {
-      productRes = await sql<Product>('select * from products where ilike $1 limit $2 offset $3', [
-        `%${q}%`,
-        limit,
-        offset,
-      ]);
+      productRes = await sql<Product>(
+        'select * from products where name ilike $1 limit $2 offset $3',
+        [`%${q}%`, limit, offset]
+      );
     } else {
       productRes = await sql<Product>('select * from products limit $1 offset $2', [limit, offset]);
     }
