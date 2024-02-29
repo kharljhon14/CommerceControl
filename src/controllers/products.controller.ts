@@ -2,6 +2,7 @@ import { Response, Request } from 'express';
 import { sql } from '../db';
 import { Product } from '../types/product';
 import { QueryResult } from 'pg';
+import { AddNewProductSchemaType } from '../schemas/product.schema';
 
 export async function getAllProducts(request: Request, response: Response) {
   try {
@@ -34,6 +35,13 @@ export async function getAllProducts(request: Request, response: Response) {
 
 export async function addProduct(request: Request, response: Response) {
   try {
+    const { name, image, description, brand, price, category }: AddNewProductSchemaType =
+      request.body;
+
+    await sql(
+      'insert into products (name, image, description, brand, price, category) values ($1, $2, $3, $4, $5, $6)',
+      [name, image, description, brand, price, category]
+    );
     return response.json({ message: 'Success' });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
