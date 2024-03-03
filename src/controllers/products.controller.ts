@@ -34,11 +34,27 @@ export async function getAllProducts(request: Request, response: Response) {
 
 export async function addProduct(request: Request, response: Response) {
   try {
-    const { name, image, description, brand, price, category }: ProductSchemaType = request.body;
+    const { name, image, description, brand, price, category_id }: ProductSchemaType = request.body;
 
     await sql(
       'insert into products (name, image, description, brand, price, category_id) values ($1, $2, $3, $4, $5, $6)',
-      [name, image, description, brand, price, category]
+      [name, image, description, brand, price, category_id]
+    );
+    return response.json({ message: 'Success' });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
+export async function updateProduct(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    const { name, image, description, brand, price, category_id }: ProductSchemaType = request.body;
+
+    await sql(
+      'update products set name = $1, image = $2, description = $3, brand = $4, price = $5, category_id = $6 where id = $7',
+      [name, image, description, brand, price, category_id, id]
     );
     return response.json({ message: 'Success' });
   } catch (err) {
