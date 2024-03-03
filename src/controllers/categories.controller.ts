@@ -12,6 +12,21 @@ export async function getCategories(_request: Request, response: Response) {
   }
 }
 
+export async function getCategory(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    const categoriesRes = await sql<Category>('select * from categories where id = $1', [id]);
+
+    if (categoriesRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find category' });
+
+    return response.json({ message: 'Success', date: categoriesRes.rows[0] });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
 export async function addCategory(request: Request, response: Response) {
   try {
     await sql('insert into categories (name) values ($1)', [request.body.name]);
