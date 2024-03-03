@@ -4,6 +4,7 @@ import {
   addCategory,
   deleteCategory,
   getCategories,
+  getCategory,
   updateCategory,
 } from '../controllers/categories.controller';
 import { CategorySchema } from '../schemas/categories.schema';
@@ -12,6 +13,7 @@ import { validateSchemaBody } from '../middlewares/schema';
 const router = Router();
 
 router.get('/', isAuthenticated, isActivated, getCategories);
+router.get('/:id', isAuthenticated, isActivated, getCategory);
 
 router.post('/', isAuthenticated, isActivated, validateSchemaBody(CategorySchema), addCategory);
 
