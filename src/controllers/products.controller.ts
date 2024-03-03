@@ -32,6 +32,21 @@ export async function getAllProducts(request: Request, response: Response) {
   }
 }
 
+export async function getProduct(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    const productRes = await sql('select * from products where id = $1', [id]);
+
+    if (productRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find product' });
+
+    return response.json({ message: 'Success', data: productRes.rows[0] });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
+
 export async function addProduct(request: Request, response: Response) {
   try {
     const { name, image, description, brand, price, category_id }: ProductSchemaType = request.body;

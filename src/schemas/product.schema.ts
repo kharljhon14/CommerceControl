@@ -19,7 +19,9 @@ export const ProductSchema = z.object({
     .positive()
     .gte(1, 'price is required')
     .lte(9999, 'price must not exceed 9999'),
-  category_id: z.string({ required_error: 'category is required' }).min(1, 'category is required'),
+  category_id: z
+    .string({ required_error: 'category_id is required' })
+    .min(1, 'category_id is required'),
 });
 
 export type ProductSchemaType = z.infer<typeof ProductSchema>;
