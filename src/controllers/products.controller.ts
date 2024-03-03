@@ -2,7 +2,7 @@ import { Response, Request } from 'express';
 import { sql } from '../db';
 import { Product } from '../types/product';
 import { QueryResult } from 'pg';
-import { AddNewProductSchemaType } from '../schemas/product.schema';
+import { ProductSchemaType } from '../schemas/product.schema';
 
 export async function getAllProducts(request: Request, response: Response) {
   try {
@@ -34,8 +34,7 @@ export async function getAllProducts(request: Request, response: Response) {
 
 export async function addProduct(request: Request, response: Response) {
   try {
-    const { name, image, description, brand, price, category }: AddNewProductSchemaType =
-      request.body;
+    const { name, image, description, brand, price, category }: ProductSchemaType = request.body;
 
     await sql(
       'insert into products (name, image, description, brand, price, category_id) values ($1, $2, $3, $4, $5, $6)',

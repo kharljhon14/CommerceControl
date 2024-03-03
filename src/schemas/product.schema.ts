@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const AddNewProductSchema = z.object({
+export const ProductSchema = z.object({
   name: z
     .string({ required_error: 'name is required' })
     .min(1, 'name is required')
@@ -22,4 +22,4 @@ export const AddNewProductSchema = z.object({
   category: z.string({ required_error: 'category is required' }).min(1, 'category is required'),
 });
 
-export type AddNewProductSchemaType = z.infer<typeof AddNewProductSchema>;
+export type ProductSchemaType = z.infer<typeof ProductSchema>;
