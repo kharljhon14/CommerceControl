@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { isActivated, isAuthenticated } from '../middlewares/auth';
-import { addCategory, getCategories, updateCategory } from '../controllers/categories.controller';
+import {
+  addCategory,
+  deleteCategory,
+  getCategories,
+  updateCategory,
+} from '../controllers/categories.controller';
 import { CategorySchema } from '../schemas/categories.schema';
 import { validateSchemaBody } from '../middlewares/schema';
 
@@ -17,5 +22,7 @@ router.patch(
   validateSchemaBody(CategorySchema),
   updateCategory
 );
+
+router.delete('/:id', isAuthenticated, isActivated, deleteCategory);
 
 export default router;

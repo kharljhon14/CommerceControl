@@ -33,3 +33,15 @@ export async function updateCategory(request: Request, response: Response) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
 }
+
+export async function deleteCategory(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    await sql('delete from categories where id = $1', [id]);
+
+    return response.json({ message: 'Success' });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
