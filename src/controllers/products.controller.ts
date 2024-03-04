@@ -67,10 +67,14 @@ export async function updateProduct(request: Request, response: Response) {
 
     const { name, image, description, brand, price, category_id }: ProductSchemaType = request.body;
 
-    await sql(
+    const productRes = await sql(
       'update products set name = $1, image = $2, description = $3, brand = $4, price = $5, category_id = $6 where id = $7',
       [name, image, description, brand, price, category_id, id]
     );
+
+    if (productRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find product' });
+
     return response.json({ message: 'Success' });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
