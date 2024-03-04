@@ -42,7 +42,13 @@ export async function updateCategory(request: Request, response: Response) {
   try {
     const { id } = request.params;
 
-    await sql('update categories set name = $1 where id = $2', [request.body.name, id]);
+    const categoriesRes = await sql('update categories set name = $1 where id = $2', [
+      request.body.name,
+      id,
+    ]);
+
+    if (categoriesRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find category' });
 
     return response.json({ message: 'Success' });
   } catch (err) {
