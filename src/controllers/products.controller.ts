@@ -80,3 +80,18 @@ export async function updateProduct(request: Request, response: Response) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
 }
+
+export async function deleteProduct(request: Request, response: Response) {
+  try {
+    const { id } = request.params;
+
+    const productRes = await sql('delete from products where id = $1', [id]);
+
+    if (productRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find product' });
+
+    return response.json({ message: 'Success' });
+  } catch (err) {
+    if (err instanceof Error) return response.status(500).json({ message: err.message });
+  }
+}
