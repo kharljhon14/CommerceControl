@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { sql } from '../db';
 import { Category } from '../types/product';
+import { DatabaseError } from 'pg';
 
 export async function getCategories(_request: Request, response: Response) {
   try {
@@ -53,10 +54,17 @@ export async function deleteCategory(request: Request, response: Response) {
   try {
     const { id } = request.params;
 
-    await sql('delete from categories where id = $1', [id]);
+    const categoriesRes = await sql('delete from categories where id = $1', [id]);
+
+    if (categoriesRes.rowCount === 0)
+      return response.status(404).json({ message: 'Could not find category' });
 
     return response.json({ message: 'Success' });
   } catch (err) {
+    if (err instanceof DatabaseError) {
+      if (err.code === '23503')
+        return response.status(409).json({ message: 'Catergory still in use' });
+    }
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
 }
