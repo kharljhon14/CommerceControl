@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   addProduct,
+  deleteProduct,
   getAllProducts,
   getProduct,
   updateProduct,
@@ -21,5 +22,7 @@ router.patch(
   validateSchemaBody(ProductSchema),
   updateProduct
 );
+
+router.delete('/:id', isAuthenticated, isActivated, deleteProduct);
 
 export default router;
