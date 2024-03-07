@@ -41,7 +41,13 @@ export async function signIn(request: Request, response: Response) {
     const token = createAuthToken({ id: user.id });
     const oneWeekMilliseconds = 7 * 24 * 60 * 60 * 1000;
 
-    response.cookie('jwt', token, { secure: true, httpOnly: true, maxAge: oneWeekMilliseconds });
+    response.cookie('jwt', token, {
+      domain: 'http://localhost:3000',
+      path: '/',
+      secure: true,
+      httpOnly: true,
+      maxAge: oneWeekMilliseconds,
+    });
 
     return response.json({ message: 'Success' });
   } catch (err) {
