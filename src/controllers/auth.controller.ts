@@ -39,11 +39,13 @@ export async function signIn(request: Request, response: Response) {
     if (!match) return response.status(401).json({ message: 'Invalid credentials' });
 
     const token = createAuthToken({ id: user.id });
-    const oneWeekMilliseconds = 7 * 24 * 60 * 60 * 1000;
 
-    response.cookie('jwt', token, { secure: true, httpOnly: true, maxAge: oneWeekMilliseconds });
-
-    return response.json({ message: 'Success' });
+    return response.json({
+      message: 'Success',
+      data: {
+        token,
+      },
+    });
   } catch (err) {
     if (err instanceof Error) return response.status(500).json({ message: err.message });
   }
