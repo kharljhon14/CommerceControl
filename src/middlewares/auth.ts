@@ -17,9 +17,9 @@ declare global {
  */
 export async function isAuthenticated(request: Request, response: Response, next: NextFunction) {
   try {
-    const cookies = request.headers.cookie;
+    const authHeader = request.headers['authorization'];
 
-    const token = cookies?.split('=')[1];
+    const token = authHeader?.split('Bearer ')[1];
 
     if (!token) return response.status(401).json({ message: 'Unauthorized' });
 
