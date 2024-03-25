@@ -23,7 +23,10 @@ export async function getAllProducts(request: Request, response: Response) {
         [`%${q}%`, limit, offset]
       );
     } else {
-      productRes = await sql<Product>('select * from products limit $1 offset $2', [limit, offset]);
+      productRes = await sql<Product>(
+        'select p.id, p.name, p.brand, p.description, p.image, p.price, p.on_sale, p.created_at, p.updated_at, c.name as category_name from products p inner join categories c on p.category_id = c.id limit $1 offset $2',
+        [limit, offset]
+      );
     }
 
     return response.json({ message: 'Success', data: productRes.rows });
@@ -36,7 +39,10 @@ export async function getProduct(request: Request, response: Response) {
   try {
     const { id } = request.params;
 
-    const productRes = await sql('select * from products where id = $1', [id]);
+    const productRes = await sql(
+      'select p.id, p.name, p.brand, p.description, p.image, p.price, p.on_sale, p.created_at, p.updated_at, c.name as category_name from products p inner join categories c on p.category_id = c.id where p.id = $1',
+      [id]
+    );
 
     if (productRes.rowCount === 0)
       return response.status(404).json({ message: 'Could not find product' });
